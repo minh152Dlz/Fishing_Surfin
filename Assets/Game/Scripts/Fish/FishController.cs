@@ -7,7 +7,7 @@ public class FishController : MonoBehaviour
     private static FishController instance;
     public static FishController Instance { get { return instance; } }
     public FishState state;
-    [SerializeField] private FloatingJoystick joystick;
+    [SerializeField] private FixedJoystick joystick;
     private Rigidbody2D rb;
     [SerializeField] private float speed;
     bool isInWaterArea = false;
