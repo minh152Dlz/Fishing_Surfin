@@ -5,9 +5,13 @@ using UnityEngine;
 public class WaterArea : MonoBehaviour
 {
     [SerializeField] private Transform[] wayPoints;
-    [SerializeField] private float speed = 2f;
+    [SerializeField] private float speed;
 
     private int currentWaypointIndex = 0;
+    private void Start()
+    {
+        StartCoroutine(IncreaseSpeedAfterDelay());
+    }
     void Update()
     {
         waterAreaPatrol();
@@ -24,5 +28,10 @@ public class WaterArea : MonoBehaviour
         {
             currentWaypointIndex = (currentWaypointIndex + 1) % wayPoints.Length;
         }
+    }
+    private IEnumerator IncreaseSpeedAfterDelay()
+    {
+        yield return new WaitForSeconds(60);
+        speed *= 2.5f;
     }
 }
