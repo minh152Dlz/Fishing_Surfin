@@ -4,15 +4,9 @@ using UnityEngine;
 
 public class Settings : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public AudioSource bgsoundGame;
+    public void ActiveSound(bool isActive)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        bgsoundGame.enabled = isActive;
     }
 }

@@ -4,9 +4,19 @@ using UnityEngine;
 
 public class FishController : MonoBehaviour
 {
+    private static FishController instance;
+    public static FishController Instance { get { return instance; } }
+    public FishState state;
+    [SerializeField] private FloatingJoystick joystick;
     private Rigidbody2D rb;
     [SerializeField] private float speed;
     bool isInWaterArea = false;
+    [SerializeField] private Transform fishPos;
+    [SerializeField] private GameObject DeathPanel;
+    private void Awake()
+    {
+        instance = this;
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -16,31 +26,45 @@ public class FishController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (state == FishState.die)
+        {
+            return;
+        }
         fishMovement();
     }
     void fishMovement()
     {
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
-        if (h > 0)
+        if (h > 0 || joystick.Direction.x > 0)
         {
             Vector3 theScale = transform.localScale;
-            theScale.x = 1;
+            theScale.x = 0.7f;
             transform.localScale = theScale;
         }
-        else if (h < 0)
+        else if (h < 0 || joystick.Direction.x < 0)
         {
             Vector3 theScale = transform.localScale;
-            theScale.x = -1;
+            theScale.x = -0.7f;
             transform.localScale = theScale;
         }
         if (isInWaterArea)
         {
-            rb.velocity = new Vector2(h, v) * speed;
+            //rb.velocity = new Vector2(h, v) * speed;
+            rb.velocity = new Vector2(joystick.Direction.x, joystick.Direction.y) * speed;
         }
         else
         {
-            rb.velocity = new Vector2(h * speed, rb.velocity.y);
+            //rb.velocity = new Vector2(h * speed, rb.velocity.y);
+            rb.velocity = new Vector2(joystick.Direction.x * speed, rb.velocity.y);
+        }
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Death")
+        {
+            state = FishState.die;
+            DeathPanel.SetActive(true);
         }
     }
     private void OnTriggerStay2D(Collider2D collision)
@@ -57,13 +81,17 @@ public class FishController : MonoBehaviour
         if (collision.CompareTag("Water"))
         {
             rb.gravityScale = 1;
-            //transform.SetParent(null);
             Invoke("ClearParent", 0.1f);
             isInWaterArea = false;
         }
     }
     private void ClearParent()
     {
-        transform.SetParent(null);
+        transform.SetParent(fishPos);
     }
+}
+public enum FishState
+{
+    alive,
+    die
 }
